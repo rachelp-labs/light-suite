@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Light Suite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --cream: #f5f2ec;
+      --warm-white: #faf8f4;
+      --parchment: #ede9df;
+      --stone: #c8c3b8;
+      --muted: #8a8680;
+      --dark: #2c2b28;
+      --soft-dark: #4a4945;
+      --sage: #8a9e8c;
+      --dusty-blue: #8899aa;
+      --blush: #c4a89a;
+      --gold: #b8a06a;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--cream);
+      color: var(--dark);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── GRAIN OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.4;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 48px 40px;
+      position: relative;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .hero-eyebrow {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--dark);
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.2s;
+    }
+
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(64px, 10vw, 112px);
+      font-weight: 500;
+      line-height: 0.95;
+      letter-spacing: -2px;
+      color: var(--dark);
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: fadeUp 0.9s ease forwards 0.4s;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: #5a7a9a;
+    }
+
+    .hero-desc {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px;
+      font-style: italic;
+      color: var(--dark);
+      max-width: 480px;
+      line-height: 1.7;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 0.9s ease forwards 0.6s;
+    }
+
+    .hero-note {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+      color: var(--dark);
+      border: 1px solid var(--dark);
+      padding: 8px 16px;
+      border-radius: 2px;
+      opacity: 0;
+      animation: fadeUp 0.9s ease forwards 0.8s;
+    }
+
+    /* ── DIVIDER ── */
+    .section-divider {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 48px;
+      height: 1px;
+      background: var(--parchment);
+    }
+
+    /* ── APPS SECTION ── */
+    .apps-section {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 48px 48px 80px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--dark);
+      margin-bottom: 64px;
+    }
+
+    /* ── APP CARD ── */
+    .app-card {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      margin-bottom: 80px;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .app-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .app-card.reverse {
+      direction: rtl;
+    }
+    .app-card.reverse > * {
+      direction: ltr;
+    }
+
+    .app-info {
+      padding: 48px 48px 48px 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .app-card.reverse .app-info {
+      padding: 48px 0 48px 48px;
+    }
+
+    .app-number {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: 3px;
+      color: var(--dark);
+      margin-bottom: 16px;
+    }
+
+    .app-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 42px;
+      font-weight: 500;
+      line-height: 1;
+      color: var(--dark);
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+
+    .app-tagline {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15px;
+      font-style: italic;
+      color: var(--dark);
+      margin-bottom: 24px;
+    }
+
+    .app-desc {
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--dark);
+      line-height: 1.8;
+      margin-bottom: 28px;
+    }
+
+    .app-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .app-tag {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--dark);
+      border: 1px solid var(--dark);
+      padding: 5px 12px;
+      border-radius: 2px;
+    }
+
+    .app-platform {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 2px;
+    }
+
+    .platform-ios {
+      color: #3a6b5a;
+      border: 1px solid #3a6b5a;
+    }
+
+    .platform-web {
+      color: #3a5a7a;
+      border: 1px solid #3a5a7a;
+    }
+
+    .beta-note {
+      font-size: 11px;
+      color: var(--dark);
+      font-style: italic;
+    }
+
+    /* ── SCREENSHOTS ── */
+    .app-screenshots {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 380px;
+      background: var(--parchment);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .screenshot-placeholder {
+      width: 100%;
+      height: 100%;
+      min-height: 380px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 32px;
+    }
+
+    /* Spotlight mockup */
+    .mockup-spotlight {
+      background: linear-gradient(145deg, #eeeae4 0%, #e8e4dc 100%);
+    }
+
+    /* Baselight mockup */
+    .mockup-baselight {
+      background: linear-gradient(145deg, #eeeae4 0%, #e8e4dc 100%);
+    }
+
+    /* Real screenshot inside phone frame */
+    .phone-screenshot {
+      width: 100%;
+      border-radius: 12px;
+      display: block;
+    }
+
+    .phone-frame-real {
+      width: 200px;
+      background: var(--warm-white);
+      border-radius: 32px;
+      padding: 14px 10px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.14), 0 4px 16px rgba(0,0,0,0.08);
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .phone-frame-real .phone-notch {
+      width: 52px;
+      height: 6px;
+      background: var(--parchment);
+      border-radius: 3px;
+      margin: 0 auto 10px;
+    }
+
+    /* Nightlight mockup */
+    .mockup-nightlight {
+      background: linear-gradient(145deg, #eeeae4 0%, #e8e4dc 100%);
+    }
+
+    /* Phone frame */
+    .phone-frame {
+      width: 180px;
+      background: var(--warm-white);
+      border-radius: 28px;
+      padding: 16px 12px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.06);
+      position: relative;
+    }
+
+    .phone-frame.dark {
+      background: #1e1d1b;
+    }
+
+    .phone-notch {
+      width: 48px;
+      height: 6px;
+      background: var(--parchment);
+      border-radius: 3px;
+      margin: 0 auto 12px;
+    }
+
+    .phone-frame.dark .phone-notch {
+      background: #3a3834;
+    }
+
+    .phone-screen {
+      width: 100%;
+      background: #f5f2ec;
+      border-radius: 12px;
+      padding: 14px 12px;
+      min-height: 300px;
+    }
+
+    .phone-frame.dark .phone-screen {
+      background: #f5f2ec;
+    }
+
+    /* Spotlight screen content */
+    .mock-app-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 8px;
+      font-weight: 500;
+      color: #8a8680;
+      margin-bottom: 8px;
+    }
+
+    .mock-heading {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: #2c2b28;
+      margin-bottom: 3px;
+      line-height: 1.2;
+    }
+
+    .mock-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 10px;
+      font-style: italic;
+      color: #8a8680;
+      margin-bottom: 14px;
+    }
+
+    .mock-card {
+      background: #ede9df;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 6px;
+    }
+
+    .mock-card-label {
+      font-size: 7px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #8a8680;
+      margin-bottom: 4px;
+    }
+
+    .mock-card-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px;
+      color: #2c2b28;
+    }
+
+    .mock-tag-row {
+      display: flex;
+      gap: 4px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .mock-tag {
+      font-size: 7px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-weight: 500;
+    }
+
+    .mock-tag-sage { background: rgba(138,158,140,0.2); color: #8a9e8c; }
+    .mock-tag-blue { background: rgba(136,153,170,0.2); color: #8899aa; }
+    .mock-tag-blush { background: rgba(196,168,154,0.2); color: #c4a89a; }
+
+    .mock-bar-row {
+      display: flex;
+      gap: 3px;
+      align-items: flex-end;
+      height: 40px;
+      margin-top: 8px;
+    }
+
+    .mock-bar {
+      flex: 1;
+      border-radius: 2px;
+      background: var(--sage);
+      opacity: 0.6;
+    }
+
+    /* Baselight screen */
+    .mock-evidence-card {
+      background: #ede9df;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 6px;
+    }
+
+    .mock-evidence-date {
+      font-size: 7px;
+      color: #8a8680;
+      margin-bottom: 3px;
+    }
+
+    .mock-evidence-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 11px;
+      color: #4a4945;
+      line-height: 1.4;
+    }
+
+    .mock-resilience-stat {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid #c8c3b8;
+    }
+
+    .mock-stat-item { text-align: center; }
+    .mock-stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 16px;
+      color: #2c2b28;
+      display: block;
+    }
+    .mock-stat-lbl {
+      font-size: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #8a8680;
+    }
+
+    /* Nightlight screen */
+    .mock-night-heading {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: #2c2b28;
+      margin-bottom: 3px;
+      line-height: 1.2;
+    }
+
+    .mock-night-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 10px;
+      font-style: italic;
+      color: #8a8680;
+      margin-bottom: 14px;
+    }
+
+    .mock-dream-card {
+      background: #ede9df;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 6px;
+    }
+
+    .mock-dream-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .mock-dream-label {
+      font-size: 6px;
+      font-weight: 500;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #8a8680;
+    }
+
+    .mock-dream-val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px;
+      color: #2c2b28;
+    }
+
+    .mock-sanctuary {
+      background: #2c2b28;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    .mock-sanctuary-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 10px;
+      font-style: italic;
+      color: rgba(255,255,255,0.85);
+      line-height: 1.4;
+    }
+
+    /* ── IN DEVELOPMENT CARD ── */
+    .coming-soon-overlay {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      border: 1px solid var(--stone);
+      padding: 4px 10px;
+      border-radius: 2px;
+      background: rgba(245,242,236,0.9);
+    }
+
+    /* ── CAROUSEL ── */
+    .carousel {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 380px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .carousel-track {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      min-height: 380px;
+      position: relative;
+    }
+
+    .carousel-slide {
+      display: none;
+      width: 100%;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+    }
+
+    .carousel-slide.active {
+      display: flex;
+    }
+
+    .carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(245,242,236,0.85);
+      border: 1px solid var(--stone);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--dark);
+      z-index: 10;
+      transition: background 0.2s, opacity 0.2s;
+      line-height: 1;
+    }
+
+    .carousel-btn:hover { background: rgba(245,242,236,1); }
+    .carousel-btn.disabled { opacity: 0.25; pointer-events: none; }
+    .carousel-btn.prev { left: 10px; }
+    .carousel-btn.next { right: 10px; }
+
+    .carousel-dots {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      z-index: 10;
+    }
+
+    .carousel-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--stone);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .carousel-dot.active { background: var(--dark); }
+
+    /* dark carousel (nightlight) */
+    .mockup-nightlight .carousel-btn {
+      background: rgba(245,242,236,0.85);
+      border-color: var(--stone);
+      color: var(--dark);
+    }
+    .mockup-nightlight .carousel-btn:hover { background: rgba(245,242,236,1); }
+    .mockup-nightlight .carousel-dot { background: var(--stone); }
+    .mockup-nightlight .carousel-dot.active { background: var(--dark); }
+
+    /* ── ABOUT ── */
+    .about-section {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 80px 48px 100px;
+      border-top: 1px solid var(--parchment);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 64px;
+      align-items: start;
+    }
+
+    .about-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--dark);
+      padding-top: 6px;
+    }
+
+    .about-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px;
+      font-weight: 400;
+      line-height: 1.75;
+      color: var(--dark);
+    }
+
+    .about-text em {
+      font-style: italic;
+      color: var(--dark);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--parchment);
+    }
+
+    .footer-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 16px;
+      font-style: italic;
+      color: var(--dark);
+    }
+
+    .footer-link {
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 1px;
+      color: var(--stone);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .footer-link:hover {
+      color: var(--soft-dark);
+      border-color: var(--stone);
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 680px) {
+      .hero { padding: 60px 28px 48px; }
+      .apps-section { padding: 60px 28px; }
+      .about-section { padding: 60px 28px 80px; }
+      footer { padding: 28px; flex-direction: column; gap: 12px; text-align: center; }
+
+      .app-card { grid-template-columns: 1fr; }
+      .app-card.reverse { direction: ltr; }
+      .app-info { padding: 32px 0 0 0 !important; }
+      .app-screenshots { min-height: 280px; }
+
+      .about-grid { grid-template-columns: 1fr; gap: 24px; }
+      .section-divider { padding: 0 28px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <section class="hero">
+    <p class="hero-eyebrow">A personal collection of apps</p>
+    <h1 class="hero-title">Light<em>Suite</em></h1>
+    <p class="hero-desc">A collection of personal wellness apps and tools built for real moments in real lives, designed to help people understand their own patterns and advocate for themselves.</p>
+    <span class="hero-note">All screens shown with sample data only &nbsp;·&nbsp; no personal information is displayed</span>
+  </section>
+
+  <div style="max-width:900px; margin:0 auto; padding:0 48px;"><hr style="border:none; border-top:1px solid #b8b3a8; margin:0;"></div>
+
+  <!-- APPS -->
+  <section class="apps-section">
+    <p class="section-label">The apps</p>
+
+    <!-- SPOTLIGHT -->
+    <div class="app-card" data-scroll>
+      <div class="app-info">
+        <p class="app-number">01</p>
+        <h2 class="app-name">Spotlight</h2>
+        <p class="app-tagline">Know your patterns. Walk in informed.</p>
+        <p class="app-desc">A cycle-tracking app built around the idea that the people who know their bodies best are the ones who show up to appointments with data. Spotlight logs symptoms, moods, and patterns over time, giving users something concrete to point to in conversations with their care team.</p>
+        <div class="app-meta">
+          <span class="app-tag">Cycle tracking</span>
+          <span class="app-tag">Pattern analysis</span>
+          <span class="app-platform platform-ios">iOS</span>
+          <span class="app-platform platform-web">Web</span>
+        </div>
+        <p class="beta-note">Currently in beta testing</p>
+      </div>
+      <div class="app-screenshots mockup-spotlight">
+        <div class="carousel" id="carousel-spotlight">
+          <div class="carousel-track">
+            <div class="carousel-slide active">
+              <div class="phone-frame-real">
+                <div class="phone-notch"></div>
+                <img src="images/spotlight-1.png" alt="Spotlight — Today view" class="phone-screenshot" />
+              </div>
+            </div>
+            <div class="carousel-slide">
+              <div class="phone-frame-real">
+                <div class="phone-notch"></div>
+                <img src="images/spotlight-2.png" alt="Spotlight — Trends Energy" class="phone-screenshot" />
+              </div>
+            </div>
+            <div class="carousel-slide">
+              <div class="phone-frame-real">
+                <div class="phone-notch"></div>
+                <img src="images/spotlight-3.png" alt="Spotlight — Calendar" class="phone-screenshot" />
+              </div>
+            </div>
+            <div class="carousel-slide">
+              <div class="phone-frame-real">
+                <div class="phone-notch"></div>
+                <img src="images/spotlight-4.png" alt="Spotlight — Trends Mood" class="phone-screenshot" />
+              </div>
+            </div>
+          </div>
+          <button class="carousel-btn prev disabled" onclick="moveCarousel('spotlight', -1)">&#8592;</button>
+          <button class="carousel-btn next" onclick="moveCarousel('spotlight', 1)">&#8594;</button>
+          <div class="carousel-dots" id="dots-spotlight">
+            <span class="carousel-dot active"></span>
+            <span class="carousel-dot"></span>
+            <span class="carousel-dot"></span>
+            <span class="carousel-dot"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BASELIGHT -->
+    <div class="app-card reverse" data-scroll>
+      <div class="app-info">
+        <p class="app-number">02</p>
+        <h2 class="app-name">Baselight</h2>
+        <p class="app-tagline">Evidence that you've been here before.</p>
+        <p class="app-desc">Built for people who go through difficult periods and sometimes lose sight of how much they've already overcome. Baselight surfaces a record of resilience, a quiet, private archive that says: you've been here before, and you got through it.</p>
+        <div class="app-meta">
+          <span class="app-tag">Resilience tracking</span>
+          <span class="app-tag">Mood logging</span>
+          <span class="app-platform platform-ios">iOS</span>
+        </div>
+        <p class="beta-note">Currently in beta testing</p>
+      </div>
+      <div class="app-screenshots mockup-baselight">
+        <div class="carousel" id="carousel-baselight">
+          <div class="carousel-track">
+            <div class="carousel-slide active">
+              <div class="phone-frame-real">
+                <div class="phone-notch"></div>
+                <img src="images/baselight-1.png" alt="Baselight — Home" class="phone-screenshot" />
+              </div>
+            </div>
+            <div class="carousel-slide">
+              <div class="phone-frame-real">
+                <div class="phone-notch"></div>
+                <img src="images/baselight-2.png" alt="Baselight — My patterns" class="phone-screenshot" />
+              </div>
+            </div>
+          </div>
+          <button class="carousel-btn prev disabled" onclick="moveCarousel('baselight', -1)">&#8592;</button>
+          <button class="carousel-btn next" onclick="moveCarousel('baselight', 1)">&#8594;</button>
+          <div class="carousel-dots" id="dots-baselight">
+            <span class="carousel-dot active"></span>
+            <span class="carousel-dot"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NIGHTLIGHT -->
+    <div class="app-card" data-scroll>
+      <div class="app-info">
+        <p class="app-number">03</p>
+        <h2 class="app-name">Nightlight</h2>
+        <p class="app-tagline">Rest here for a moment. You are safe.</p>
+        <p class="app-desc">A dream journal with AI-powered reflection. Log dreams, rate vividness, heaviness, and echo, and receive grounded, science-based reflections on what your nervous system may have been processing. Pattern analysis surfaces trends over time. A personal sanctuary card holds your own words and images.</p>
+        <div class="app-meta">
+          <span class="app-tag">Dream journaling</span>
+          <span class="app-tag">AI reflection</span>
+          <span class="app-tag">Pattern analysis</span>
+          <span class="app-platform platform-ios">iOS</span>
+        </div>
+        <p class="beta-note">Currently in development</p>
+      </div>
+      <div class="app-screenshots mockup-nightlight">
+        <div class="carousel" id="carousel-nightlight">
+          <div class="carousel-track">
+            <div class="carousel-slide active">
+              <div class="phone-frame-real">
+                <div class="phone-notch"></div>
+                <img src="images/nightlight-1.png" alt="Nightlight — Capture a dream" class="phone-screenshot" />
+              </div>
+            </div>
+            <div class="carousel-slide">
+              <div class="phone-frame-real">
+                <div class="phone-notch"></div>
+                <img src="images/nightlight-2.png" alt="Nightlight — My patterns" class="phone-screenshot" />
+              </div>
+            </div>
+          </div>
+          <button class="carousel-btn prev disabled" onclick="moveCarousel('nightlight', -1)">&#8592;</button>
+          <button class="carousel-btn next" onclick="moveCarousel('nightlight', 1)">&#8594;</button>
+          <div class="carousel-dots" id="dots-nightlight">
+            <span class="carousel-dot active"></span>
+            <span class="carousel-dot"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about-section">
+    <div class="about-grid">
+      <p class="about-label">About the builder</p>
+      <p class="about-text">
+        A medical writer and clinical disclosure specialist who builds things on the side: iOS apps, websites, tools. Currently based in Denmark, where a compulsory pull toward Lego sets and pottery has proven difficult to resist.<br><br>
+        All three apps in the Light Suite were built in SwiftUI and are currently in beta. None are on the App Store, yet.
+      </p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p class="footer-name">Light Suite</p>
+  </footer>
+
+  <script>
+    // Scroll-reveal
+    const cards = document.querySelectorAll('[data-scroll]');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+      });
+    }, { threshold: 0.1 });
+    cards.forEach(c => observer.observe(c));
+
+    // Carousel
+    function moveCarousel(id, dir) {
+      const track = document.querySelector(`#carousel-${id} .carousel-track`);
+      const slides = track.querySelectorAll('.carousel-slide');
+      const dots = document.querySelectorAll(`#dots-${id} .carousel-dot`);
+      let current = [...slides].findIndex(s => s.classList.contains('active'));
+      slides[current].classList.remove('active');
+      dots[current].classList.remove('active');
+      current = Math.max(0, Math.min(slides.length - 1, current + dir));
+      slides[current].classList.add('active');
+      dots[current].classList.add('active');
+      updateBtns(id, current, slides.length);
+    }
+
+    function updateBtns(id, current, total) {
+      const prev = document.querySelector(`#carousel-${id} .prev`);
+      const next = document.querySelector(`#carousel-${id} .next`);
+      prev.classList.toggle('disabled', current === 0);
+      next.classList.toggle('disabled', current === total - 1);
+    }
+  </script>
+
+</body>
+</html>
