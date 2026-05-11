@@ -743,6 +743,11 @@
       cursor: default;
     }
 
+    .lightbox-img.web-lightbox {
+      max-width: min(820px, 92vw);
+      border-radius: 12px;
+    }
+
     .lightbox-close {
       position: fixed;
       top: 24px;
@@ -896,7 +901,7 @@
             </div>
             <div class="carousel-slide">
               <div class="phone-frame-real web-frame">
-                <img src="images/spotlight-5.png" alt="Spotlight — Website" class="phone-screenshot" />
+                <img src="images/spotlight-5.png" alt="Spotlight — Website" class="phone-screenshot web-screenshot" />
               </div>
             </div>
           </div>
@@ -984,11 +989,18 @@
                 <img src="images/nightlight-2.png" alt="Nightlight — My patterns" class="phone-screenshot" />
               </div>
             </div>
+            <div class="carousel-slide">
+              <div class="phone-frame-real">
+                <div class="phone-notch"></div>
+                <img src="images/nightlight-3.png" alt="Nightlight — Sanctuary" class="phone-screenshot" />
+              </div>
+            </div>
           </div>
           <button class="carousel-btn prev disabled" onclick="moveCarousel('nightlight', -1)">&#8592;</button>
           <button class="carousel-btn next" onclick="moveCarousel('nightlight', 1)">&#8594;</button>
           <div class="carousel-dots" id="dots-nightlight">
             <span class="carousel-dot active"></span>
+            <span class="carousel-dot"></span>
             <span class="carousel-dot"></span>
           </div>
         </div>
@@ -1054,8 +1066,10 @@
     // Lightbox
     document.querySelectorAll('.phone-screenshot').forEach(img => {
       img.addEventListener('click', () => {
-        document.getElementById('lightbox-img').src = img.src;
-        document.getElementById('lightbox-img').alt = img.alt;
+        const lightboxImg = document.getElementById('lightbox-img');
+        lightboxImg.src = img.src;
+        lightboxImg.alt = img.alt;
+        lightboxImg.classList.toggle('web-lightbox', img.classList.contains('web-screenshot'));
         document.getElementById('lightbox').classList.add('open');
         document.body.style.overflow = 'hidden';
       });
