@@ -653,6 +653,7 @@
       grid-template-columns: 1fr 2fr;
       gap: 64px;
       align-items: start;
+      justify-items: start;
     }
 
     .about-label {
@@ -710,6 +711,102 @@
       border-color: var(--stone);
     }
 
+    /* ── LIGHTBOX ── */
+    .lightbox-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(44,43,40,0.88);
+      z-index: 9000;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      cursor: zoom-out;
+    }
+
+    .lightbox-overlay.open {
+      display: flex;
+    }
+
+    .lightbox-img {
+      max-width: min(400px, 90vw);
+      max-height: 88vh;
+      border-radius: 20px;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+      object-fit: contain;
+      cursor: default;
+    }
+
+    .lightbox-close {
+      position: fixed;
+      top: 24px;
+      right: 28px;
+      font-size: 22px;
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
+      background: none;
+      border: none;
+      line-height: 1;
+      transition: color 0.2s;
+      z-index: 9001;
+    }
+
+    .lightbox-close:hover { color: #fff; }
+
+    .phone-screenshot {
+      cursor: zoom-in;
+    }
+
+    /* ── ABOUT LINKEDIN ── */
+    .about-contact {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding-top: 4px;
+      align-items: flex-start;
+    }
+
+    .about-contact-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px;
+      font-weight: 400;
+      line-height: 1.75;
+      color: var(--dark);
+    }
+
+    .linkedin-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid var(--stone);
+      border-radius: 4px;
+      padding: 10px 16px;
+      text-decoration: none;
+      color: var(--dark);
+      background: var(--warm-white);
+      transition: border-color 0.2s, background 0.2s;
+      max-width: fit-content;
+    }
+
+    .linkedin-card:hover {
+      border-color: var(--soft-dark);
+      background: var(--parchment);
+    }
+
+    .linkedin-icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      opacity: 0.75;
+    }
+
+    .linkedin-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
     /* ── ANIMATIONS ── */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(20px); }
@@ -755,7 +852,7 @@
         <p class="app-number">01</p>
         <h2 class="app-name">Spotlight</h2>
         <p class="app-tagline">Know your patterns. Walk in informed.</p>
-        <p class="app-desc">A cycle-tracking app built around the idea that the people who know their bodies best are the ones who show up to appointments with data. Spotlight logs symptoms, moods, and patterns over time, giving users something concrete to point to in conversations with their care team.</p>
+        <p class="app-desc">A cycle-tracking iOS app and companion website built around the idea that the people who know their bodies best are the ones who show up to appointments with data. Spotlight logs symptoms, moods, and patterns over time, giving users something concrete to point to in conversations with their care team.</p>
         <div class="app-meta">
           <span class="app-tag">Cycle tracking</span>
           <span class="app-tag">Pattern analysis</span>
@@ -791,11 +888,18 @@
                 <img src="images/spotlight-4.png" alt="Spotlight — Trends Mood" class="phone-screenshot" />
               </div>
             </div>
+            <div class="carousel-slide">
+              <div class="phone-frame-real">
+                <div class="phone-notch"></div>
+                <img src="images/spotlight-5.png" alt="Spotlight — Website" class="phone-screenshot" />
+              </div>
+            </div>
           </div>
           <button class="carousel-btn prev disabled" onclick="moveCarousel('spotlight', -1)">&#8592;</button>
           <button class="carousel-btn next" onclick="moveCarousel('spotlight', 1)">&#8594;</button>
           <div class="carousel-dots" id="dots-spotlight">
             <span class="carousel-dot active"></span>
+            <span class="carousel-dot"></span>
             <span class="carousel-dot"></span>
             <span class="carousel-dot"></span>
             <span class="carousel-dot"></span>
@@ -814,9 +918,10 @@
         <div class="app-meta">
           <span class="app-tag">Resilience tracking</span>
           <span class="app-tag">Mood logging</span>
+          <span class="app-tag">AI reflection</span>
           <span class="app-platform platform-ios">iOS</span>
         </div>
-        <p class="beta-note">Currently in beta testing</p>
+        <p class="beta-note">Currently in development</p>
       </div>
       <div class="app-screenshots mockup-baselight">
         <div class="carousel" id="carousel-baselight">
@@ -889,14 +994,21 @@
 
   <!-- ABOUT -->
   <section class="about-section">
-    <div class="about-grid">
-      <p class="about-label">About the builder</p>
-      <p class="about-text">
-        A medical writer and clinical disclosure specialist who builds things on the side: iOS apps, websites, tools. Currently based in Denmark, where a compulsory pull toward Lego sets and pottery has proven difficult to resist.<br><br>
-        All three apps in the Light Suite were built in SwiftUI and are currently in beta. None are on the App Store, yet.
-      </p>
+    <div class="about-contact">
+      <a class="linkedin-card" href="https://www.linkedin.com/in/rachperez/" target="_blank" rel="noopener">
+        <svg class="linkedin-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20.447 20.452H16.89v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a1.98 1.98 0 0 1-1.98-1.98c0-1.093.887-1.98 1.98-1.98 1.093 0 1.98.887 1.98 1.98a1.98 1.98 0 0 1-1.98 1.98zm1.979 13.019H3.358V9h3.958v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+        </svg>
+        <span class="linkedin-label">Connect on LinkedIn</span>
+      </a>
     </div>
   </section>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox-overlay" id="lightbox" onclick="closeLightbox(event)">
+    <button class="lightbox-close" onclick="closeLightbox()">&#x2715;</button>
+    <img class="lightbox-img" id="lightbox-img" src="" alt="" onclick="event.stopPropagation()" />
+  </div>
 
   <!-- FOOTER -->
   <footer>
@@ -933,6 +1045,26 @@
       prev.classList.toggle('disabled', current === 0);
       next.classList.toggle('disabled', current === total - 1);
     }
+
+    // Lightbox
+    document.querySelectorAll('.phone-screenshot').forEach(img => {
+      img.addEventListener('click', () => {
+        document.getElementById('lightbox-img').src = img.src;
+        document.getElementById('lightbox-img').alt = img.alt;
+        document.getElementById('lightbox').classList.add('open');
+        document.body.style.overflow = 'hidden';
+      });
+    });
+
+    function closeLightbox(e) {
+      if (e && e.target !== document.getElementById('lightbox') && !e.target.classList.contains('lightbox-close')) return;
+      document.getElementById('lightbox').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeLightbox({ target: document.getElementById('lightbox') });
+    });
   </script>
 
 </body>
